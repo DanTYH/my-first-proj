@@ -1,5 +1,8 @@
 #include "main.h"
+#include "motors.h"
 #include "calculator.h"
+#include "sensorFunctions.h"
+#include "globals.h"
 
 /**
  * A callback function for LLEMU's center button.
@@ -59,7 +62,11 @@ void competition_initialize() {}
  * will be stopped. Re-enabling the robot will restart the task, not re-start it
  * from where it left off.
  */
-void autonomous() {}
+void autonomous() {
+	encoderMove(1000, 127);
+	IMUMove(90, 127);
+	potentiometerMove(4096, 127);
+}
 
 /**
  * Runs the operator control code. This function will be started in its own task
@@ -76,8 +83,7 @@ void autonomous() {}
  */
 void opcontrol() {
 	pros::Controller master(pros::E_CONTROLLER_MASTER);
-	pros::Motor left_mtr(1);
-	pros::Motor right_mtr(2);
+
 
 	while (true) {
 		pros::lcd::print(0, "%d %d %d", (pros::lcd::read_buttons() & LCD_BTN_LEFT) >> 2,
@@ -86,8 +92,9 @@ void opcontrol() {
 		int power = master.get_analog(ANALOG_LEFT_Y);
 		int turn = master.get_analog(ANALOG_RIGHT_X);
 
-		left_mtr = power+turn;
-		right_mtr = power-turn;	
+		frontLeftMotor = power+turn;
+		frontRightMotor = power-turn;	
 		pros::delay(20);
 	}
 }
+
